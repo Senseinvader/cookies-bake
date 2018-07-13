@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+
+</head>
+<body>
+<div class="form-container">
+    <div class="greeting">
+        <h2>{{ greeting }}</h2>
+    </div>
+    <form action="#" onkeyup="validate();" onsubmit="return validateUser();" class="inputs-container">
+
+        <div class="input">
+            <input type="text" class="input" id="login" name="username" placeholder="Your login" required>
+            <p id="err-login-fn"></p>
+        </div>
+        <div class="input">
+            <input type="password" class="input" id="pass" name="password" placeholder="Your password" required>
+            <p id="err-pass-fn"></p>
+        </div>
+        <input type="submit" class="login-button" id="login-button" name="submit" value="Sign in" >
+    </form>
+
+
+
+
+
+</div>
+{#<script src="../javascript/scripts.js"></script>#}
+</body>
+</html>
