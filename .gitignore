@@ -20,4 +20,21 @@
 *.rar
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+hs_err_pid
+
+
+.idea/*
+*.iml
+*.xml
+*.DB_Store
+.DS_Store
+
+target/
+*/.settings/
+*/.classpath
+*/.project
+.lst
+.classpath
+.project
+.settings/
+bin/
