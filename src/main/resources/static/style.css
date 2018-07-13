@@ -1,0 +1,130 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-image: url("../../images/background-blue.jpg");
+    display: flex;
+    justify-content: center;
+}
+.greeting h2 {
+    color: white;
+    text-transform: uppercase;
+    font-size: 3vw;
+    font-weight: normal;
+    margin-top: 40px;
+}
+.form-container * {
+    box-sizing: border-box;
+}
+.form-container {
+    display: flex;
+    position: relative;
+    width:50%;
+    min-width: max-content;
+    height: 460px;
+    background-color: rgba(24, 33, 52, 0.7);
+    text-align: center;
+    flex-direction: column;
+    box-shadow: 0 -5px 0 #3adbfd;
+    border-radius: 0 0 10px 10px;
+    align-items: center;
+    margin-top: 120px;
+}
+form.inputs-container {
+    margin-top: 20px;
+}
+input[type="text"], input[type="password"] {
+    position: relative;
+    height: 50px;
+    font-size: 18px;
+    margin-bottom: 35px;
+    border-radius: 4px;
+    padding-left: 40px;
+    min-width: 100%;
+}
+.input:before {
+    z-index: 2;
+    font-family: "FontAwesome";
+    content: "\f007";
+    position: absolute;
+    font-size: 30px;
+    padding: 10px 0 0 7px;
+    color: #2c536c;
+}
+.input:nth-child(2):before {
+    content: "\f023";
+    margin-top: 0;
+}
+.login-button,
+.submit-button {
+    padding: 10px 25px;
+    background-color: #64dfd4;
+    color: white;
+}
+.login-button,
+.submit-button {
+    padding: 10px 25px;
+    background-color: #3adbfd;
+    border: none;
+    border-radius: 3px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.login-button:hover,
+.submit-button:hover {
+    transition: all 0.5s;
+    background: #fff;
+    color: #1a394f;
+}
+
+#err-login-fn,
+#err-pass-fn {
+    color: white;
+    margin: -20px 0 10px 0;
+}
+
+
+
