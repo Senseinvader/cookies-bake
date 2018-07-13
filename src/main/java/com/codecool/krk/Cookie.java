@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpCookie;
+import java.util.Random;
 
 public class Cookie implements HttpHandler {
     private int counter = 0;
@@ -36,5 +37,15 @@ public class Cookie implements HttpHandler {
         OutputStream os = httpExchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
+    }
+
+    private String idGenerator() {
+        Random random = new Random();
+        String allSybmols = "!#$%&()*+-0123456789<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz";
+        char [] id = new char[10];
+        for (int i=0; i<10; i++) {
+            id[i] = allSybmols.charAt(random.nextInt(allSybmols.length()));
+        }
+        return new String(id);
     }
 }
