@@ -13,7 +13,7 @@
     <div class="greeting">
         <h2>{{ greeting }}</h2>
     </div>
-    <form action="Login" onkeyup="validate();" onsubmit="return validateUser();" class="inputs-container">
+    <form method="POST" class="inputs-container">
 
         <div class="input">
             <input type="text" class="input" id="login" name="username" placeholder="Your login" required>
@@ -26,11 +26,6 @@
         <input type="submit" class="login-button" id="login-button" name="submit" value="Sign in" >
     </form>
 
-
-
-
-
 </div>
-{#<script src="../javascript/scripts.js"></script>#}
 </body>
 </html>
