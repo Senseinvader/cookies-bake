@@ -24,7 +24,7 @@ public class Cookie implements HttpHandler {
             cookie = HttpCookie.parse(cookieStr).get(0);
             isNewSession = false;
         } else { // Create a new cookie
-            cookie = new HttpCookie("sessionId", String.valueOf(counter)); // This isn't a good way to create sessionId. Find out better!
+            cookie = new HttpCookie("sessionId", generateId()); // This isn't a good way to create sessionId. Find out better!
             isNewSession = true;
             httpExchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
         }
@@ -39,9 +39,9 @@ public class Cookie implements HttpHandler {
         os.close();
     }
 
-    private String idGenerator() {
+    private String generateId() {
         Random random = new Random();
-        String allSybmols = "!#$%&()*+-0123456789<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz";
+        String allSybmols = "!#$%&*+-0123456789<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz";
         char [] id = new char[10];
         for (int i=0; i<10; i++) {
             id[i] = allSybmols.charAt(random.nextInt(allSybmols.length()));

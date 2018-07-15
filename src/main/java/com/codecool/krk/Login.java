@@ -1,6 +1,5 @@
 package com.codecool.krk;
 
-import com.codecool.krk.aux.MimeTypeResolver;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.jtwig.JtwigModel;
@@ -8,14 +7,13 @@ import org.jtwig.JtwigTemplate;
 
 import java.io.*;
 import java.net.HttpCookie;
-import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 
 public class Login implements HttpHandler {
 
     private DAO dao;
+    private User currentUser;
 
     public Login() {
         this.dao = new DAO();
@@ -23,64 +21,94 @@ public class Login implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange httpExchange) throws UnsupportedEncodingException, IOException {
-
+    public void handle(HttpExchange httpExchange) throws IOException {
         String method = httpExchange.getRequestMethod();
-        String cookieStr = httpExchange.getRequestHeaders().getFirst("Cookie");
+
+        String cookieStr = parseSessionId(httpExchange);
         HttpCookie cookie;
         String response = "";
 
         if (method.equals("POST")) {
-
             InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), "UTF8");
             BufferedReader br = new BufferedReader(isr);
             String inputs = br.readLine();
 
             Map<String, String> formData = parseInputs(inputs);
-            System.out.println(formData.toString());
 
-            for (User entry : dao.getUserData()) {
-                if (formData.get("username").equals(entry.getLogin()) &&
-                        (formData.get("password").equals(entry.getPass()))) {
-
-                    JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/index.twig");
-                    JtwigModel model = JtwigModel.newModel();
-                    model.with("greeting", "Hello, " + formData.get("username"));
-                    response = template.render(model);
-                    String id = generateId();
-                    cookie = new HttpCookie("sessionId", id);
-                    httpExchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
-                    httpExchange.sendResponseHeaders(200, response.length());
-                } else {
-                    System.out.println("Wrong login data!");
-                }
+            if (findUserMatch(formData)) {
+                System.out.println("loading logout");
+                JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logout.twig");
+                JtwigModel model = JtwigModel.newModel();
+                model.with("greeting", "Hello, " + currentUser.getLogin());
+                response = template.render(model);
+                String id = generateId();
+                cookie = new HttpCookie("sessionId", id);
+                currentUser.setSessionId(id);  // add cookie to user object
+                httpExchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
+                httpExchange.sendResponseHeaders(200, response.length());
+            } else {
+                System.out.println("Wrong login data!");
+                JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.twig");
+                JtwigModel model = JtwigModel.newModel();
+                model.with("greeting", "Wrong login data!");
+                response = template.render(model);
+                httpExchange.sendResponseHeaders(200, response.length());
             }
-
-            httpExchange.sendResponseHeaders(200, response.length());
         }
         if (method.equals("GET")) {
-            if (cookieStr == null) {
-                URI uri = httpExchange.getRequestURI();
-                String path = "." + uri.getPath();
-
-                ClassLoader classLoader = getClass().getClassLoader();
-                URL fileURL = classLoader.getResource(path);
-
-                if (fileURL == null) {
-                    send404(httpExchange);
-                } else {
-                    sendFile(httpExchange, fileURL);
-                }
+            System.out.println("we are here");
+            System.out.println(cookieStr);
+            if (getUserById(cookieStr) == null) {
+                JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/login.twig");
+                JtwigModel model = JtwigModel.newModel();
+                response = template.render(model);
+                httpExchange.sendResponseHeaders(200, response.length());
+                System.out.println("reached this place");
             } else {
-                cookie = new HttpCookie("sessionId", generateId());
+                User entry = getUserById(cookieStr);
+                cookie = new HttpCookie("sessionId", cookieStr);
+                JtwigTemplate template = JtwigTemplate.classpathTemplate("templates/logout.twig");
+                JtwigModel model = JtwigModel.newModel();
+                model.with("greeting", "Hello, " + entry.getLogin());
+                response = template.render(model);
                 httpExchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
+                httpExchange.sendResponseHeaders(200, response.length());
+                System.out.println("reached another place");
             }
         }
+        OutputStream os = httpExchange.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
+    }
+
+    private User getUserById (String cookieStr) {
+        for (User entry : dao.getUserData()) {
+            System.out.println(entry.getSessionId());
+            if (entry.getSessionId().equals(cookieStr)) {
+                System.out.println("yes");
+                return entry;
+            }
+        }
+        System.out.println("no");
+        return null;
     }
 
     private void addUserData() {
         dao.getUserData().add(new User("admin", "pass"));
         dao.getUserData().add(new User("user", "word"));
+    }
+
+    private boolean findUserMatch(Map<String, String> formData) {
+        boolean match = false;
+        for (User entry : dao.getUserData()) {
+            if (formData.get("username").equals(entry.getLogin()) &&
+                    (formData.get("password").equals(entry.getPass()))) {
+                System.out.println("true true))");
+                currentUser = entry;
+                match = true;
+            }
+        }
+        return match;
     }
 
     private String generateId() {
@@ -104,30 +132,16 @@ public class Login implements HttpHandler {
         return map;
     }
 
-    private void send404(HttpExchange httpExchange) throws IOException {
-        String response = "404, page not found";
-        httpExchange.sendResponseHeaders(404, response.length());
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+    private String parseSessionId(HttpExchange httpExchange) {
+        if (httpExchange.getRequestHeaders().getFirst("Cookie") != null) {
+            String [] idPair = httpExchange.getRequestHeaders().getFirst("Cookie").split("=");
+            return idPair[1].replaceAll("\"", "");
+        }
+        return null;
     }
 
-    private void sendFile(HttpExchange httpExchange, URL fileURL) throws IOException {
-        File file = new File(fileURL.getFile());
-        MimeTypeResolver resolver = new MimeTypeResolver(file);
-        String mime = resolver.getMimeType();
-
-        httpExchange.getResponseHeaders().set("Content-Type", mime);
-        httpExchange.sendResponseHeaders(200, 0);
-
-        OutputStream os = httpExchange.getResponseBody();
-        FileInputStream fs = new FileInputStream(file);
-        final byte[] buffer = new byte[0x10000];
-        int count;
-        while ((count = fs.read(buffer)) >= 0) {
-            os.write(buffer,0,count);
-        }
-        os.close();
+    public User getCurrentUser() {
+        return currentUser;
     }
 }
 

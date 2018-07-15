@@ -15,7 +15,7 @@ public class User {
     public User(String login, String pass) {
         this.login = login;
         this.pass = pass;
-        this.sessionId = null;
+        this.sessionId = "";
     }
 
     public String getLogin() {

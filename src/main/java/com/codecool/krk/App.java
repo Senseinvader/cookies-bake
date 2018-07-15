@@ -11,6 +11,7 @@ public class App {
 
         // set routes
         server.createContext("/cookie", new Cookie());
+        server.createContext("/login", new Login());
         server.setExecutor(null); // creates a default executor
         server.start();
     }
